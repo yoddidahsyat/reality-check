@@ -1,0 +1,18 @@
+.dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  opacity: 0.25;
+  transition: background var(--dur-base), opacity var(--dur-base);
+}
+
+.active {
+  background: var(--color-accent-strong);
+  opacity: 1;
+}

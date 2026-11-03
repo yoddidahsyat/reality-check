@@ -1,0 +1,16 @@
+.btn {
+  display: grid;
+  place-items: center;
+  width: 2.875rem;
+  height: 2.875rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+
+.btn:hover {
+  background: var(--color-surface-strong);
+}

@@ -1,0 +1,15 @@
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Letters start dim; GSAP fades each one to full white in reading order (see WalkthroughClient). */
+.char {
+  color: var(--color-text-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char {
+    color: var(--color-text);
+  }
+}

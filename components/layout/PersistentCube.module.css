@@ -1,0 +1,28 @@
+/* Same column as the app shell (centred, max 430px) so the cube lines up with the design. */
+.layer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(100%, var(--app-max-width));
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1; /* above the shell background, below the Home statements (z-index 2) */
+}
+
+/* Home pose: centre at y=305. The Lottie canvas is 650px and its settled hexagon ~578px wide;
+   19.125rem (306px) makes that hexagon 272px — the design's 17rem cube. GSAP does the rest. */
+.cube {
+  position: absolute;
+  top: 305px;
+  left: 50%;
+  width: 19.125rem;
+  aspect-ratio: 1;
+  opacity: 0; /* GSAP reveals it; avoids a flash before the first animation frame */
+}
+
+.cube > div {
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,26 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  background: var(--color-bg);
+}
+
+.shell {
+  position: relative;
+  width: 100%;
+  max-width: var(--app-max-width);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 55% at 50% 22%, var(--color-bg-glow) 0%, transparent 70%),
+    linear-gradient(180deg, #14161d 0%, var(--color-bg) 60%);
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--gutter) 2.5rem;
+}

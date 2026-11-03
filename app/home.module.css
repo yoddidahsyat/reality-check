@@ -1,0 +1,109 @@
+.home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Positions below are taken from the 390×844 design frame.
+   Stage spans y=140…470 (cube centre y=305); header ends at y≈112. */
+.stage {
+  position: relative;
+  height: 20.625rem; /* 330px */
+  margin: 1.75rem calc(var(--gutter) * -1) 0; /* 28px */
+}
+
+/* The cube itself is the persistent one in the root layout (components/layout/PersistentCube),
+   centred at y=305 behind this stage. The statements sit above it (z-index 2 vs the cube's 1). */
+
+.statements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.statement {
+  position: absolute;
+  z-index: 2;
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.0625rem; /* 17px, as in the design's two-line statement */
+  white-space: nowrap;
+  color: var(--color-text);
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transform-origin: left center;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+/* Mouse hover (only on devices that really hover) or touch (data-active, toggled by tapping in
+   page.tsx: tap once to enlarge and keep it, tap again to restore): the text scales up 1.5×. */
+.statement[data-active="true"] {
+  transform: scale(1.5);
+  z-index: 3;
+}
+@media (hover: hover) {
+  .statement:hover {
+    transform: scale(1.5);
+    z-index: 3;
+  }
+}
+
+/* Hide the intro elements before GSAP takes over, so there is no flash of the end state */
+@media (prefers-reduced-motion: no-preference) {
+  .statement,
+  .headline,
+  .cta {
+    opacity: 0;
+  }
+}
+
+/* top = design line-centre y − 8.5px (half a line) − 140px (stage top) */
+.s1 { top: 2.28rem; left: var(--gutter); }                 /* y 185 */
+.s2 { top: 4.84rem; right: 1.8rem; text-align: right; transform-origin: right center; }    /* y 226, ends at x≈361 */
+.s3 { top: 8.66rem; left: var(--gutter); }                 /* y 287 */
+.s4 { top: 12.66rem; left: 8.875rem; transform-origin: right center; } /* y 351, starts at x=142; grows leftwards so it stays on screen */
+.s5 { top: 16.53rem; left: 1.3125rem; white-space: normal; width: 13.5rem; } /* y 413 + 430, wraps after "digital" */
+
+/* The first statement is ~276px wide: 1.5× would run off a 390px screen, so while enlarged it wraps. */
+.s1[data-active="true"] {
+  white-space: normal;
+  width: 14.5rem;
+}
+@media (hover: hover) {
+  .s1:hover {
+    white-space: normal;
+    width: 14.5rem;
+  }
+}
+
+.headline {
+  margin: 0.6875rem 0 0; /* first line centre at y≈498 */
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 1.2; /* ≈34px between lines */
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.accent {
+  color: var(--color-accent); /* fallback if background-clip: text is unsupported */
+  /* As in Figma, the gradient spans the whole headline box, so the word shows only a slice of it.
+     --grad-w / --grad-x (headline width and the word's offset in it) are measured in page.tsx. */
+  background-image: linear-gradient(90deg, #fabbff 0%, #b179ff 35%, #6dddff 83%);
+  background-repeat: no-repeat;
+  background-size: var(--grad-w, 100%) 100%;
+  background-position: var(--grad-x, 0) 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cta {
+  margin-top: auto;
+}
+
+.headline + .cta {
+  margin-top: 2.875rem; /* button top at y≈628 */
+}

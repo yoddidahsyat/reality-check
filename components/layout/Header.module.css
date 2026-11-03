@@ -1,0 +1,16 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--header-top) var(--gutter) 0; /* icon buttons start at y=66 in the design */
+}
+
+.logo {
+  width: 7.6875rem;
+  height: auto;
+}
+
+.spacer {
+  width: 2.875rem;
+  height: 2.875rem;
+}

@@ -1,0 +1,76 @@
+.field {
+  width: 100%;
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.5rem;
+  padding: 0 0.75rem 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-input);
+  background: rgba(10, 11, 16, 0.85);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.box:focus-within {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px rgba(127, 227, 255, 0.18);
+}
+
+.invalid,
+.invalid:focus-within {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(255, 138, 155, 0.15);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 1rem; /* >=16px avoids iOS zoom on focus */
+  color: var(--color-text);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:focus {
+  outline: none; /* focus is shown on the surrounding box */
+}
+
+.send {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.28);
+  color: #0b0c10;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+
+.send:hover {
+  background: var(--color-accent);
+}
+
+/* Value is valid → the arrow button turns white */
+.send[data-valid="true"],
+.send[data-valid="true"]:hover {
+  background: var(--color-light);
+}
+
+.error {
+  min-height: 1.25rem;
+  margin: 0.5rem 0.25rem 0;
+  font-size: var(--fs-small);
+  color: var(--color-error);
+}
