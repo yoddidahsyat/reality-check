@@ -11,11 +11,12 @@
   z-index: 1; /* above the shell background, below the Home statements (z-index 2) */
 }
 
-/* Home pose: centre at y=305. The Lottie canvas is 650px and its settled hexagon ~578px wide;
-   19.125rem (306px) makes that hexagon 272px — the design's 17rem cube. GSAP does the rest. */
+/* The cube is a fixed-size box at the layer's top centre; GSAP moves and scales it onto the
+   current screen's anchor (see PersistentCube.tsx), so no screen positions are hardcoded here.
+   19.125rem (306px) makes the Lottie's settled hexagon 272px at scale 1. */
 .cube {
   position: absolute;
-  top: 305px;
+  top: 0;
   left: 50%;
   width: 19.125rem;
   aspect-ratio: 1;

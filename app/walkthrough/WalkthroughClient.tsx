@@ -83,8 +83,9 @@ export default function WalkthroughClient() {
 
   return (
     <AppShell onBack={goBack}>
-      {/* The cube above the text is the persistent one from the root layout (PersistentCube);
-          only the copy is swiped. */}
+      {/* The cube above the text is the persistent one from the root layout (PersistentCube); it
+          moves onto this anchor. Only the copy is swiped. */}
+      <div data-cube-anchor="step2" className={styles.cubeAnchor} aria-hidden="true" />
       <Swiper
         className={styles.swiper}
         modules={[A11y, Keyboard]}

@@ -51,9 +51,14 @@ public/images/   logo, icons, cube-gradient.jpg (the gradient picture used insid
 ```
 
 ## How it works
-- **One cube for the whole flow.** `PersistentCube` lives in the root layout, so it is not remounted on navigation. GSAP moves and scales it between its Home and step-2 poses while the Lottie keeps looping. Screens read `lib/cubeStore` to wait for it (Home fades its texts in after the first Lottie pass; step 2 reveals its text once the cube has scaled down).
+- **One cube for the whole flow.** `PersistentCube` lives in the root layout, so it is not remounted on navigation. Each screen renders an invisible anchor (`data-cube-anchor="home"` / `"step2"`); GSAP measures it and moves/scales the cube onto it while the Lottie keeps looping, and it follows the anchor if the layout changes (resize, breakpoint). Screens read `lib/cubeStore` to wait for the cube (Home fades its texts in after the first Lottie pass; step 2 reveals its text once the cube has scaled down).
 - **Gradient through a Lottie.** `GradientLottie` moves the Lottie's layers into an SVG `<mask>` and draws the gradient bitmap through it, so the gradient follows the animated outline. The bitmap is sized to the shape's final frame.
 - **Restoring screens.** Cache Components keeps visited screens alive and restores their state. Animations therefore re-apply on every visit (layout effects), and flows that must start over use keys (`restartKey`, `formKey`) instead of assuming a fresh mount.
+
+## Responsive notes
+- There are no width-based media queries yet: the design is a single 390px column (max 430px, centred). Only `prefers-reduced-motion` and `(hover: hover)` are queried.
+- The Home stage (cube anchor + statements) is sized in percentages of its width, and the headline size is fluid, so it scales down to roughly 340px.
+- For a desktop layout: add breakpoint overrides for the tokens in `app/styles.css`, place the `data-cube-anchor` elements in the new layout (the cube follows them, no positions to change in JS), and use `gsap.matchMedia()` for any per-breakpoint timelines.
 
 ## Accessibility
 Semantic landmarks, labelled icon buttons, hidden-but-present input labels, `aria-invalid`/`aria-describedby` with `role="alert"` errors, visible `:focus-visible` rings, keyboard support in Swiper, `role="progressbar"` and `role="status"` on the submitting screen, and a screen-reader copy of the per-letter text. `prefers-reduced-motion` turns off the GSAP, Lenis and Lottie motion and shows the final states.

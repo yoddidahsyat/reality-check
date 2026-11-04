@@ -4,16 +4,27 @@
   flex-direction: column;
 }
 
-/* Positions below are taken from the 390×844 design frame.
-   Stage spans y=140…470 (cube centre y=305); header ends at y≈112. */
+/* Positions below are taken from the 390×844 design frame (stage: 390×330, spanning
+   y=140…470, header ends at y≈112) but written as percentages of the stage, so the stage
+   — cube anchor and statements together — scales with the screen width. */
 .stage {
   position: relative;
-  height: 20.625rem; /* 330px */
+  aspect-ratio: 390 / 330;
   margin: 1.75rem calc(var(--gutter) * -1) 0; /* 28px */
 }
 
-/* The cube itself is the persistent one in the root layout (components/layout/PersistentCube),
-   centred at y=305 behind this stage. The statements sit above it (z-index 2 vs the cube's 1). */
+/* The cube itself is the persistent one in the root layout (components/layout/PersistentCube):
+   it moves onto this invisible anchor (272px = 69.74% of the stage at the design size).
+   The statements sit above it (z-index 2 vs the cube's 1). */
+.cubeAnchor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 69.74%;
+  aspect-ratio: 272 / 288;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
 
 .statements {
   list-style: none;
@@ -58,12 +69,13 @@
   }
 }
 
-/* top = design line-centre y − 8.5px (half a line) − 140px (stage top) */
-.s1 { top: 2.28rem; left: var(--gutter); }                 /* y 185 */
-.s2 { top: 4.84rem; right: 1.8rem; text-align: right; transform-origin: right center; }    /* y 226, ends at x≈361 */
-.s3 { top: 8.66rem; left: var(--gutter); }                 /* y 287 */
-.s4 { top: 12.66rem; left: 8.875rem; transform-origin: right center; } /* y 351, starts at x=142; grows leftwards so it stays on screen */
-.s5 { top: 16.53rem; left: 1.3125rem; white-space: normal; width: 13.5rem; } /* y 413 + 430, wraps after "digital" */
+/* top   = (design line-centre y − 8.5px − 140px stage top) ÷ 330px
+   left  = design x ÷ 390px,  right = (390 − design right edge) ÷ 390px */
+.s1 { top: 11.06%; left: 5.128%; }                                              /* y 185, x 20 */
+.s2 { top: 23.48%; right: 7.385%; text-align: right; transform-origin: right center; } /* y 226, ends at x≈361 */
+.s3 { top: 41.97%; left: 5.128%; }                                              /* y 287, x 20 */
+.s4 { top: 61.36%; left: 36.41%; transform-origin: right center; }             /* y 351, x 142; grows leftwards so it stays on screen */
+.s5 { top: 80.15%; left: 5.385%; white-space: normal; width: 55.38%; }         /* y 413 + 430, x 21, wraps after "digital" */
 
 /* The first statement is ~276px wide: 1.5× would run off a 390px screen, so while enlarged it wraps. */
 .s1[data-active="true"] {
@@ -81,7 +93,7 @@
   margin: 0.6875rem 0 0; /* first line centre at y≈498 */
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: 1.75rem;
+  font-size: min(1.75rem, 7.18vw); /* 28px at 390px and wider; shrinks on narrower screens so it keeps its 3 lines */
   line-height: 1.2; /* ≈34px between lines */
   text-align: center;
   letter-spacing: -0.01em;

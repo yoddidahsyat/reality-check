@@ -86,6 +86,8 @@ export default function Home() {
     <AppShell showBack={false}>
       <div ref={root} className={styles.home}>
         <div className={styles.stage}>
+          {/* Where the persistent cube sits on this screen (it moves onto this box) */}
+          <div data-cube-anchor="home" className={styles.cubeAnchor} aria-hidden="true" />
           <ul className={styles.statements} aria-label="What professionals are saying">
             {statements.map((s, i) => (
               <li

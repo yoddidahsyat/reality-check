@@ -1,3 +1,15 @@
+/* Where the persistent cube sits on step 2: hexagon box 146×155, top at y=180 in the 390px design.
+   Positioned against the shell (the nearest positioned ancestor), not the swiper. */
+.cubeAnchor {
+  position: absolute;
+  top: 11.25rem; /* 180px */
+  left: 50%;
+  width: min(9.125rem, 37.44%); /* 146px at the design width, scales down with narrower shells */
+  aspect-ratio: 146 / 155;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
 .swiper {
   flex: 1;
   width: calc(100% + var(--gutter) * 2);

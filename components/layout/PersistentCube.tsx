@@ -11,33 +11,47 @@ import styles from "./PersistentCube.module.css";
 
 type Pose = "home" | "step2" | "hidden";
 
-/**
- * The cube is positioned at its Home size/place (centre y=305, 272px wide in the 390px design);
- * other screens are expressed as an offset + scale from that.
- * Step 2: centre y=258, 146px wide → y −47px, scale 146/272.
- */
-const POSES = {
-  home: { y: 0, scale: 1 },
-  step2: { y: -47, scale: 146 / 272 },
-} as const;
+/** The Lottie canvas is 650px wide and its settled hexagon is ~578px of it. */
+const HEX_RATIO = 578 / 650;
 
 const poseFor = (pathname: string): Pose => (pathname === "/" ? "home" : pathname === "/walkthrough" ? "step2" : "hidden");
 
 /**
+ * Where the cube should be for a pose: the screen renders an invisible element marked
+ * `data-cube-anchor="<pose>"` (its box is the cube's box) and the cube is moved/scaled onto it.
+ * No pixel positions live here, so any layout — other widths, breakpoints, a desktop design —
+ * only needs to place that anchor in CSS.
+ */
+function anchorPose(cube: HTMLElement, layer: HTMLElement, pose: Exclude<Pose, "hidden">) {
+  const anchor = document.querySelector<HTMLElement>(`[data-cube-anchor="${pose}"]`);
+  if (!anchor) return null;
+  const a = anchor.getBoundingClientRect();
+  if (!a.width) return null; // not displayed (e.g. a hidden, kept-alive screen)
+  const l = layer.getBoundingClientRect();
+  return {
+    x: a.left + a.width / 2 - (l.left + l.width / 2),
+    y: a.top + a.height / 2 - l.top,
+    scale: a.width / (cube.offsetWidth * HEX_RATIO), // the hexagon, not the canvas, fills the anchor
+  };
+}
+
+/**
  * One cube for the whole flow. It lives in the root layout, so it is not remounted on
- * navigation: the Lottie keeps playing while GSAP moves/scales it between screens.
+ * navigation: the Lottie keeps playing while GSAP moves/scales it between screens' anchors.
  */
 export default function PersistentCube() {
   const pathname = usePathname();
   const pose = poseFor(pathname);
   const { restartKey } = useFormData();
+  const layer = useRef<HTMLDivElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const introRan = useRef(-1); // restartKey the grow-in intro last played for
   const introTween = useRef<gsap.core.Tween | null>(null);
 
   useLayoutEffect(() => {
     const el = wrap.current;
-    if (!el) return;
+    const layerEl = layer.current;
+    if (!el || !layerEl) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const base = { xPercent: -50, yPercent: -50, transformOrigin: "50% 50%" };
 
@@ -47,40 +61,52 @@ export default function PersistentCube() {
 
     gsap.killTweensOf(el);
 
-    // `settledPose` is null while the cube is moving/fading and becomes the pose once it has
-    // arrived; screens use it to hold their content back until the cube is done (step 2's text).
-    const settle = () => cubeStore.setSettledPose(pose);
-
     if (pose === "hidden") {
       cubeStore.setSettledPose("hidden");
       gsap.to(el, { opacity: 0, duration: reduce ? 0 : 0.3 });
       return;
     }
 
+    // `settledPose` is null while the cube is moving/fading and becomes the pose once it has
+    // arrived; screens use it to hold their content back until the cube is done (step 2's text).
+    const settle = () => cubeStore.setSettledPose(pose);
+    const target = anchorPose(el, layerEl, pose);
+    if (!target) {
+      settle(); // no anchor on this screen: nothing to move to
+      return;
+    }
     cubeStore.setSettledPose(null);
 
     if (playIntro) {
       introRan.current = restartKey;
       cubeStore.setIntroDone(false);
-      gsap.set(el, { ...base, ...POSES.home, opacity: 1, scale: reduce ? 1 : 0 });
+      gsap.set(el, { ...base, ...target, opacity: 1, scale: reduce ? target.scale : 0 });
       if (reduce) settle();
-      else introTween.current = gsap.to(el, { scale: 1, duration: 1.4, ease: "power3.out", onComplete: settle });
-      return;
-    }
-
-    const target = POSES[pose];
-    if (Number(gsap.getProperty(el, "opacity")) < 0.01) {
+      else introTween.current = gsap.to(el, { scale: target.scale, duration: 1.4, ease: "power3.out", onComplete: settle });
+    } else if (Number(gsap.getProperty(el, "opacity")) < 0.01) {
       // Landing directly here, or coming back from a screen without the cube: appear in place
       gsap.set(el, { ...base, ...target, opacity: 0 });
       gsap.to(el, { opacity: 1, duration: reduce ? 0 : 0.6, onComplete: settle });
     } else {
-      // Moving between screens: same cube, scaled/moved smoothly
+      // Moving between screens: same cube, scaled/moved smoothly onto the new anchor
       gsap.to(el, { ...target, opacity: 1, duration: reduce ? 0 : 1, ease: "power3.inOut", onComplete: settle });
     }
+
+    // Once at rest, stay on the anchor when the layout changes (resize, breakpoint change).
+    const follow = () => {
+      if (cubeStore.getSettledPose() !== pose) return;
+      const t = anchorPose(el, layerEl, pose);
+      if (t) gsap.set(el, t);
+    };
+    const observer = new ResizeObserver(follow);
+    observer.observe(layerEl);
+    const anchorEl = document.querySelector(`[data-cube-anchor="${pose}"]`);
+    if (anchorEl) observer.observe(anchorEl);
+    return () => observer.disconnect();
   }, [pose, restartKey]);
 
   return (
-    <div className={styles.layer} aria-hidden="true">
+    <div ref={layer} className={styles.layer} aria-hidden="true">
       <div ref={wrap} className={styles.cube}>
         <GradientLottie key={restartKey} data={hexAnimation} loop onComplete={() => cubeStore.setIntroDone(true)} />
       </div>
