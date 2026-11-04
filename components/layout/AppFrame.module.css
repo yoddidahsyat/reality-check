@@ -2,3 +2,11 @@
   position: relative;
   min-height: 100dvh;
 }
+
+/* Same condition as the shell in AppShell.module.css: exactly the window's height on desktop */
+@media (min-width: 768px) and (min-height: 700px) {
+  .frame {
+    height: 100dvh;
+    min-height: 0;
+  }
+}

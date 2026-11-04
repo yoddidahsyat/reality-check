@@ -20,7 +20,21 @@
 
 .main {
   flex: 1;
+  min-height: 0; /* lets the content shrink inside a fixed-height shell */
   display: flex;
   flex-direction: column;
   padding: 0 var(--gutter) 2.5rem;
+}
+
+/* Desktop windows: the page is exactly as tall as the window (no page scroll), as long as the
+   window is tall enough for the compressed layout (~700px). Phones and very short windows keep
+   the natural min-height behaviour above, which can scroll. */
+@media (min-width: 768px) and (min-height: 700px) {
+  .page {
+    height: 100dvh;
+    min-height: 0;
+  }
+  .shell {
+    min-height: 0;
+  }
 }

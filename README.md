@@ -56,7 +56,7 @@ public/images/   logo, icons, cube-gradient.jpg (the gradient picture used insid
 - **Restoring screens.** Cache Components keeps visited screens alive and restores their state. Animations therefore re-apply on every visit (layout effects), and flows that must start over use keys (`restartKey`, `formKey`) instead of assuming a fresh mount.
 
 ## Responsive notes
-- There are no width-based media queries yet: the design is a single 390px column (max 430px, centred). Only `prefers-reduced-motion` and `(hover: hover)` are queried.
+- The design is a single 390px column (max 430px, centred); there is no separate desktop layout yet. Queried: `prefers-reduced-motion`, `(hover: hover)`, and one size query — on windows at least 768px wide and 700px tall the page is exactly the window's height (no page scroll), with Home's gap above the button compressing to fit. Smaller or shorter windows keep the natural, scrollable height. The scrollbar's space is always reserved (`scrollbar-gutter: stable`) so screens don't shift.
 - The Home stage (cube anchor + statements) is sized in percentages of its width, and the headline size is fluid, so it scales down to roughly 340px.
 - For a desktop layout: add breakpoint overrides for the tokens in `app/styles.css`, place the `data-cube-anchor` elements in the new layout (the cube follows them, no positions to change in JS), and use `gsap.matchMedia()` for any per-breakpoint timelines.
 

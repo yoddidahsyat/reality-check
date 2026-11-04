@@ -70,39 +70,69 @@ export default function PersistentCube() {
     // `settledPose` is null while the cube is moving/fading and becomes the pose once it has
     // arrived; screens use it to hold their content back until the cube is done (step 2's text).
     const settle = () => cubeStore.setSettledPose(pose);
-    const target = anchorPose(el, layerEl, pose);
-    if (!target) {
-      settle(); // no anchor on this screen: nothing to move to
-      return;
-    }
     cubeStore.setSettledPose(null);
 
-    if (playIntro) {
-      introRan.current = restartKey;
-      cubeStore.setIntroDone(false);
-      gsap.set(el, { ...base, ...target, opacity: 1, scale: reduce ? target.scale : 0 });
-      if (reduce) settle();
-      else introTween.current = gsap.to(el, { scale: target.scale, duration: 1.4, ease: "power3.out", onComplete: settle });
-    } else if (Number(gsap.getProperty(el, "opacity")) < 0.01) {
-      // Landing directly here, or coming back from a screen without the cube: appear in place
-      gsap.set(el, { ...base, ...target, opacity: 0 });
-      gsap.to(el, { opacity: 1, duration: reduce ? 0 : 0.6, onComplete: settle });
+    let resizeObserver: ResizeObserver | undefined;
+    let waitForAnchor: MutationObserver | undefined;
+    let giveUp: number | undefined;
+
+    const start = (target: NonNullable<ReturnType<typeof anchorPose>>) => {
+      if (playIntro) {
+        introRan.current = restartKey;
+        cubeStore.setIntroDone(false);
+        gsap.set(el, { ...base, ...target, opacity: 1, scale: reduce ? target.scale : 0 });
+        if (reduce) settle();
+        else introTween.current = gsap.to(el, { scale: target.scale, duration: 1.4, ease: "power3.out", onComplete: settle });
+      } else if (Number(gsap.getProperty(el, "opacity")) < 0.01) {
+        // Landing directly here, or coming back from a screen without the cube: appear in place
+        gsap.set(el, { ...base, ...target, opacity: 0 });
+        gsap.to(el, { opacity: 1, duration: reduce ? 0 : 0.6, onComplete: settle });
+      } else {
+        // Moving between screens: same cube, scaled/moved smoothly onto the new anchor
+        gsap.to(el, { ...target, opacity: 1, duration: reduce ? 0 : 1, ease: "power3.inOut", onComplete: settle });
+      }
+
+      // Once at rest, stay on the anchor when the layout changes (resize, breakpoint change).
+      const follow = () => {
+        if (cubeStore.getSettledPose() !== pose) return;
+        const t = anchorPose(el, layerEl, pose);
+        if (t) gsap.set(el, t);
+      };
+      resizeObserver = new ResizeObserver(follow);
+      resizeObserver.observe(layerEl);
+      // A scrollbar appearing/disappearing shifts the centred layout without resizing the layer
+      // itself; the page's own width does change, so watch that too.
+      resizeObserver.observe(document.documentElement);
+      const anchorEl = document.querySelector(`[data-cube-anchor="${pose}"]`);
+      if (anchorEl) resizeObserver.observe(anchorEl);
+    };
+
+    const target = anchorPose(el, layerEl, pose);
+    if (target) {
+      start(target);
     } else {
-      // Moving between screens: same cube, scaled/moved smoothly onto the new anchor
-      gsap.to(el, { ...target, opacity: 1, duration: reduce ? 0 : 1, ease: "power3.inOut", onComplete: settle });
+      // The screen's anchor isn't in the page yet: on a first visit or a refresh the screen's
+      // content streams in after this effect runs. Wait for it to appear (settledPose stays null,
+      // so the screen keeps its content hidden meanwhile) and then move the cube.
+      waitForAnchor = new MutationObserver(() => {
+        const t = anchorPose(el, layerEl, pose);
+        if (!t) return;
+        waitForAnchor?.disconnect();
+        window.clearTimeout(giveUp);
+        start(t);
+      });
+      waitForAnchor.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["style", "hidden", "class"] });
+      giveUp = window.setTimeout(() => {
+        waitForAnchor?.disconnect();
+        settle(); // this screen never rendered an anchor: don't leave it waiting forever
+      }, 4000);
     }
 
-    // Once at rest, stay on the anchor when the layout changes (resize, breakpoint change).
-    const follow = () => {
-      if (cubeStore.getSettledPose() !== pose) return;
-      const t = anchorPose(el, layerEl, pose);
-      if (t) gsap.set(el, t);
+    return () => {
+      waitForAnchor?.disconnect();
+      window.clearTimeout(giveUp);
+      resizeObserver?.disconnect();
     };
-    const observer = new ResizeObserver(follow);
-    observer.observe(layerEl);
-    const anchorEl = document.querySelector(`[data-cube-anchor="${pose}"]`);
-    if (anchorEl) observer.observe(anchorEl);
-    return () => observer.disconnect();
   }, [pose, restartKey]);
 
   return (

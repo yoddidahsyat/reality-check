@@ -56,6 +56,9 @@
 html {
   background: var(--color-bg);
   color-scheme: dark;
+  /* Always reserve the scrollbar's space: a screen that scrolls (e.g. Home on a short desktop
+     window) and one that doesn't would otherwise differ in width and shift the centred layout. */
+  scrollbar-gutter: stable;
 }
 
 body {

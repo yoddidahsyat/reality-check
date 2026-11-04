@@ -109,6 +109,7 @@ export default function Home() {
         <h1 className={styles.headline}>
           Compare your thoughts on <span className={styles.accent}>technology</span> with current industry opinions.
         </h1>
+        <div className={styles.spacer} aria-hidden="true" />
         <Button href="/walkthrough" className={styles.cta}>
           Get a reality check
         </Button>

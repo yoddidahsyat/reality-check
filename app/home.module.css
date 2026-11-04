@@ -9,6 +9,7 @@
    — cube anchor and statements together — scales with the screen width. */
 .stage {
   position: relative;
+  flex: none; /* never squeezed: its proportions carry the cube and the statements */
   aspect-ratio: 390 / 330;
   margin: 1.75rem calc(var(--gutter) * -1) 0; /* 28px */
 }
@@ -90,6 +91,7 @@
 }
 
 .headline {
+  flex: none;
   margin: 0.6875rem 0 0; /* first line centre at y≈498 */
   font-family: var(--font-body);
   font-weight: 400;
@@ -112,10 +114,10 @@
   -webkit-text-fill-color: transparent;
 }
 
-.cta {
-  margin-top: auto;
-}
-
-.headline + .cta {
-  margin-top: 2.875rem; /* button top at y≈628 */
+/* Gap between the title and the button: 46px as in the design (button top at y≈628) when there
+   is room, shrinking to 8px when the window is short so Home fits a fixed-height desktop page. */
+.spacer {
+  flex: 1 1 0;
+  min-height: 0.5rem;
+  max-height: 2.875rem;
 }
