@@ -38,3 +38,12 @@
     min-height: 0;
   }
 }
+
+/* On-screen keyboard open (see KeyboardFit / AppFrame.module.css): fill the pinned visible area */
+:global(html.keyboard-open) .page {
+  height: 100%;
+  min-height: 0;
+}
+:global(html.keyboard-open) .shell {
+  min-height: 0;
+}

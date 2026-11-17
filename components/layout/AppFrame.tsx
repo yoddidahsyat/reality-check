@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import KeyboardFit from "./KeyboardFit";
 import PersistentCube from "./PersistentCube";
 import styles from "./AppFrame.module.css";
 
@@ -8,6 +9,7 @@ export default function AppFrame({ children }: { children: ReactNode }) {
     <div className={styles.frame}>
       {children}
       <PersistentCube />
+      <KeyboardFit />
     </div>
   );
 }

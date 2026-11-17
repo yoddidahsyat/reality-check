@@ -10,3 +10,16 @@
     min-height: 0;
   }
 }
+
+/* On-screen keyboard open (class and variables set by KeyboardFit): pin the app to the visible
+   area so it compresses above the keyboard instead of being scrolled out of view. Kept last so
+   it wins over the rules above. */
+:global(html.keyboard-open) .frame {
+  position: fixed;
+  top: var(--vvt, 0px);
+  left: 0;
+  width: 100%;
+  height: var(--vvh, 100dvh);
+  min-height: 0;
+  overflow: hidden;
+}

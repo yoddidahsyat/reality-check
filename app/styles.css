@@ -82,6 +82,13 @@ input {
   outline-offset: 3px;
 }
 
+/* While the on-screen keyboard is open the app is pinned to the visible area (KeyboardFit): the
+   page itself must not scroll underneath it. */
+html.keyboard-open,
+html.keyboard-open body {
+  overflow: hidden;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
